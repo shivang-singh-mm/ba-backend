@@ -40,12 +40,13 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 def run_schema(conn, filepath: str):
     abs_path = os.path.join(BASE_DIR, filepath)
-    with open(abs_path, "r") as f:
+    with open(abs_path, "r", encoding="utf-8") as f:
         sql = f.read()
     with conn.cursor() as cur:
         cur.execute(sql)
     conn.commit()
-    print(f"  ✓ Applied: {filepath}")
+    print(f"  [OK] Applied: {filepath}")
+
 
 
 def main():

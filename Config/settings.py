@@ -41,8 +41,15 @@ class BaseConfig:
         "MAIL_DEFAULT_SENDER", "BrandActivation <no-reply@brandactivation.com>"
     )
 
+    # ── AI / OpenRouter ────────────────────────────────────────────────────────
+    OPENROUTER_API_KEY   = os.environ.get("OPENROUTER_API_KEY", "")
+    OPENROUTER_MODEL     = os.environ.get("OPENROUTER_MODEL", "meta-llama/llama-3.1-8b-instruct:free")
+    OPENROUTER_SITE_URL  = os.environ.get("OPENROUTER_SITE_URL", "http://localhost:5000")
+    OPENROUTER_SITE_NAME = os.environ.get("OPENROUTER_SITE_NAME", "BrandActivation")
+
     # ── App ────────────────────────────────────────────────────────────────────
     APP_NAME = os.environ.get("APP_NAME", "BrandActivation")
+
     FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:3000")
     JSON_SORT_KEYS = False
     PROPAGATE_EXCEPTIONS = True

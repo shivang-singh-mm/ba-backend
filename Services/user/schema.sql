@@ -35,3 +35,25 @@ CREATE TRIGGER trg_users_updated_at
     BEFORE UPDATE ON users
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+-- User Experiences Table
+-- Holds past campaign experience, brand name, role performed, and duration.
+CREATE TABLE IF NOT EXISTS user_experiences (
+    id          SERIAL          PRIMARY KEY,
+    user_id     INTEGER         NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    brand_name  VARCHAR(150)    NOT NULL,
+    role_name   VARCHAR(100)    NOT NULL,
+    duration    VARCHAR(50),
+    description TEXT,
+    created_at  TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_experiences_user ON user_experiences (user_id);
+
+DROP TRIGGER IF EXISTS trg_user_experiences_updated_at ON user_experiences;
+CREATE TRIGGER trg_user_experiences_updated_at
+    BEFORE UPDATE ON user_experiences
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+

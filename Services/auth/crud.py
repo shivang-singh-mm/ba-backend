@@ -40,6 +40,8 @@ def _insert_otp(email: str, purpose: str, plain_otp: str,
     Hash the OTP and persist the record.
     Returns the new otp_codes.id.
     """
+
+    print("otp",plain_otp)
     otp_hash = hash_otp(plain_otp)
     expires_at = get_otp_expiry()
 
@@ -64,9 +66,9 @@ def _send_and_record_otp(email: str, purpose: str, name: str = "",
     plain_otp = generate_otp()
     _insert_otp(email, purpose, plain_otp, pending_name=name, pending_role=pending_role)
 
-    sent = send_otp_email(to_email=email, otp=plain_otp, purpose=purpose, name=name)
-    if not sent:
-        return None, "Failed to send OTP email. Please try again."
+    # sent = send_otp_email(to_email=email, otp=plain_otp, purpose=purpose, name=name)
+    # if not sent:
+    #     return None, "Failed to send OTP email. Please try again."
 
     logger.info(f"OTP dispatched [email={email}, purpose={purpose}]")
     return plain_otp, None
@@ -119,7 +121,7 @@ def _validate_otp(email: str, plain_otp: str, purpose: str) -> tuple:
 def _build_jwt(user_row: dict) -> dict:
     """Issue a JWT access token for the given user row."""
     access_token = create_access_token(
-        identity=user_row["id"],
+        identity=str(user_row["id"]),
         additional_claims={
             "role":  user_row["role"],
             "email": user_row["email"],

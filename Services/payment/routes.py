@@ -11,7 +11,7 @@ payment_bp = Blueprint("payment", __name__)
 @jwt_required()
 def list_payments():
     """List all payments for the authenticated user."""
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     payments = get_payments_by_user(user_id)
     return success_response(data=payments, message="Payments fetched successfully")
 
@@ -20,7 +20,7 @@ def list_payments():
 @jwt_required()
 def get_payment(payment_id):
     """Get a single payment by ID."""
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     payment = get_payment_by_id(payment_id, user_id)
     if not payment:
         return error_response("Payment not found", 404)
@@ -31,7 +31,7 @@ def get_payment(payment_id):
 @jwt_required()
 def create_payment_route():
     """Create a new payment record."""
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     data = request.get_json(silent=True) or {}
     payment = create_payment(
         user_id=user_id,

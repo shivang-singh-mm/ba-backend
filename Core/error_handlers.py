@@ -23,6 +23,7 @@ def register_error_handlers(app):
 
     @app.errorhandler(422)
     def unprocessable(error):
+        print("error", error)
         return jsonify({"success": False, "message": "Unprocessable entity", "error": str(error)}), 422
 
     @app.errorhandler(500)

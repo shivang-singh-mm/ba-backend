@@ -62,14 +62,36 @@ def get_conn():
         raise RuntimeError("Database pool is not initialised. Call init_pool() first.")
 
     conn = _pool.getconn()
+    is_broken = False
     try:
+        # Check connection health before yielding
+        if conn.closed:
+            raise psycopg2.InterfaceError("Connection is closed.")
         yield conn
         conn.commit()
+    except (psycopg2.OperationalError, psycopg2.InterfaceError) as e:
+        is_broken = True
+        logger.warning(f"Database connection error: {e}. Discarding connection from pool.")
+        try:
+            conn.close()
+        except Exception:
+            pass
+        raise
     except Exception:
-        conn.rollback()
+        try:
+            conn.rollback()
+        except (psycopg2.OperationalError, psycopg2.InterfaceError, psycopg2.InternalError):
+            is_broken = True
         raise
     finally:
-        _pool.putconn(conn)
+        if is_broken:
+            # Tell the pool to discard this connection by marking it as broken
+            try:
+                _pool.putconn(conn, close=True)
+            except Exception:
+                pass
+        else:
+            _pool.putconn(conn)
 
 
 @contextmanager

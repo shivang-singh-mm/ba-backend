@@ -44,7 +44,23 @@ def create_app(config_name="development"):
 
     @jwt.revoked_token_loader
     def revoked_token_callback(jwt_header, jwt_payload):
+        print("[JWT ERROR] Token has been revoked:", jwt_payload)
         return jsonify({"success": False, "message": "Token has been revoked. Please log in again."}), 401
+
+    @jwt.expired_token_loader
+    def expired_token_callback(jwt_header, jwt_payload):
+        print("[JWT ERROR] Token has expired:", jwt_payload)
+        return jsonify({"success": False, "message": "Token has expired. Please log in again."}), 401
+
+    @jwt.invalid_token_loader
+    def invalid_token_callback(error_string):
+        print("[JWT ERROR] Invalid token signature:", error_string)
+        return jsonify({"success": False, "message": "Signature verification failed.", "error": error_string}), 422
+
+    @jwt.unauthorized_loader
+    def missing_token_callback(error_string):
+        print("[JWT ERROR] Missing or malformed authorization header:", error_string)
+        return jsonify({"success": False, "message": "Request is missing authorization token.", "error": error_string}), 401
 
     # ── Error Handlers ────────────────────────────────────────────────────────
     register_error_handlers(app)

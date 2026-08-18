@@ -81,7 +81,7 @@ def logout():
 def me():
     """Return the current authenticated user's profile."""
     from Services.user.crud import get_user_by_id
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     user = get_user_by_id(user_id)
     if not user:
         return error_response("User not found", 404)
