@@ -53,12 +53,6 @@ class BaseConfig:
     MATCHING_AI_PROVIDER = os.environ.get("MATCHING_AI_PROVIDER", "openai")  # openai | openrouter
     MATCHING_AI_MODEL    = os.environ.get("MATCHING_AI_MODEL", "gpt-3.5-turbo")
 
-    MATCH_WEIGHT_LOCATION      = float(os.environ.get("MATCH_WEIGHT_LOCATION", 0.20))
-    MATCH_WEIGHT_LANGUAGE      = float(os.environ.get("MATCH_WEIGHT_LANGUAGE", 0.20))
-    MATCH_WEIGHT_INDUSTRY      = float(os.environ.get("MATCH_WEIGHT_INDUSTRY", 0.15))
-    MATCH_WEIGHT_SKILLS        = float(os.environ.get("MATCH_WEIGHT_SKILLS", 0.20))
-    MATCH_WEIGHT_AI_EXPERIENCE = float(os.environ.get("MATCH_WEIGHT_AI_EXPERIENCE", 0.25))
-
     # ── App ────────────────────────────────────────────────────────────────────
     APP_NAME = os.environ.get("APP_NAME", "BrandActivation")
 

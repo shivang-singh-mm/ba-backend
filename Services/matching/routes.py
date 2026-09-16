@@ -14,6 +14,8 @@ from .crud import (
     get_all_matched_providers,
     get_match_by_id,
     update_match_status,
+    upsert_campaign_match_weights,
+    get_campaign_match_weights,
 )
 from .enum import MATCH_STATUS_ID
 from .engine import run_matching_pipeline
@@ -21,6 +23,29 @@ from Services.campaigns.crud import get_campaign_by_id
 from Core.response import success_response, error_response
 
 matching_bp = Blueprint("matching", __name__)
+
+
+@matching_bp.route("/campaigns/<int:campaign_id>/weights", methods=["POST"])
+@jwt_required()
+def set_campaign_match_weights(campaign_id: int):
+    """
+    Store or update matching weights for a specific campaign.
+    """
+    user_id = int(get_jwt_identity())
+
+    campaign = get_campaign_by_id(campaign_id)
+    if not campaign:
+        return error_response("Campaign not found", 404)
+    if campaign["user_id"] != user_id:
+        return error_response("Forbidden: You do not own this campaign", 403)
+
+    data = request.get_json(silent=True) or {}
+    weights = upsert_campaign_match_weights(campaign_id, data)
+    return success_response(
+        data=weights,
+        message="Matching weights saved successfully",
+        status_code=201,
+    )
 
 
 @matching_bp.route("/campaigns/<int:campaign_id>/run", methods=["POST"])
@@ -33,7 +58,7 @@ def run_campaign_matching(campaign_id: int):
     3. Apply deterministic hard filters.
     4. Compute structured compatibility scores.
     5. Compute AI semantic experience fit (configurable model e.g. GPT-3.5).
-    6. Aggregate weighted scores & rank candidates.
+    6. Aggregate weighted scores from database & rank candidates.
     7. Persist match records and return ranked results.
     """
     user_id = int(get_jwt_identity())
@@ -53,15 +78,9 @@ def run_campaign_matching(campaign_id: int):
             message="No active providers available in the system."
         )
 
-    # 2. Extract configuration from Flask app config
+    # 2. Extract configuration: weights from DB, AI provider from app config
+    weights = get_campaign_match_weights(campaign_id)
     cfg = current_app.config
-    weights = {
-        "location":      float(cfg.get("MATCH_WEIGHT_LOCATION", 0.20)),
-        "language":      float(cfg.get("MATCH_WEIGHT_LANGUAGE", 0.20)),
-        "industry":      float(cfg.get("MATCH_WEIGHT_INDUSTRY", 0.15)),
-        "skills":        float(cfg.get("MATCH_WEIGHT_SKILLS", 0.20)),
-        "ai_experience": float(cfg.get("MATCH_WEIGHT_AI_EXPERIENCE", 0.25)),
-    }
 
     ai_config = {
         "provider":           cfg.get("MATCHING_AI_PROVIDER", "openai"),

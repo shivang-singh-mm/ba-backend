@@ -94,3 +94,44 @@ class CampaignProviderMatch:
             "created_at":          self.created_at.isoformat() if self.created_at else None,
             "updated_at":          self.updated_at.isoformat() if self.updated_at else None,
         }
+
+
+@dataclass
+class CampaignMatchWeights:
+    id: int
+    campaign_id: int
+    location_weight: Decimal
+    language_weight: Decimal
+    industry_weight: Decimal
+    skills_weight: Decimal
+    ai_experience_weight: Decimal
+    created_at: datetime
+    updated_at: datetime
+
+    @classmethod
+    def from_row(cls, row: dict) -> "CampaignMatchWeights":
+        return cls(
+            id=row["id"],
+            campaign_id=row["campaign_id"],
+            location_weight=row.get("location_weight", Decimal("0.20")),
+            language_weight=row.get("language_weight", Decimal("0.20")),
+            industry_weight=row.get("industry_weight", Decimal("0.15")),
+            skills_weight=row.get("skills_weight", Decimal("0.20")),
+            ai_experience_weight=row.get("ai_experience_weight", Decimal("0.25")),
+            created_at=row["created_at"],
+            updated_at=row["updated_at"],
+        )
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "id":                   self.id,
+            "campaign_id":          self.campaign_id,
+            "location_weight":      float(self.location_weight),
+            "language_weight":      float(self.language_weight),
+            "industry_weight":      float(self.industry_weight),
+            "skills_weight":        float(self.skills_weight),
+            "ai_experience_weight": float(self.ai_experience_weight),
+            "created_at":           self.created_at.isoformat() if self.created_at else None,
+            "updated_at":           self.updated_at.isoformat() if self.updated_at else None,
+        }
+

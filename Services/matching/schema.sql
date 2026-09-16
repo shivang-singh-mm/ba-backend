@@ -37,3 +37,28 @@ CREATE TRIGGER trg_campaign_provider_matches_updated_at
     BEFORE UPDATE ON campaign_provider_matches
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+
+-- Campaign Match Weights
+CREATE TABLE IF NOT EXISTS campaign_match_weights (
+    id                  SERIAL          PRIMARY KEY,
+    campaign_id         INTEGER         NOT NULL REFERENCES campaigns(id) ON DELETE CASCADE UNIQUE,
+
+    location_weight     NUMERIC(4, 2)   NOT NULL DEFAULT 0.20,
+    language_weight     NUMERIC(4, 2)   NOT NULL DEFAULT 0.20,
+    industry_weight     NUMERIC(4, 2)   NOT NULL DEFAULT 0.15,
+    skills_weight       NUMERIC(4, 2)   NOT NULL DEFAULT 0.20,
+    ai_experience_weight NUMERIC(4, 2)  NOT NULL DEFAULT 0.25,
+
+    created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_campaign_match_weights_campaign ON campaign_match_weights(campaign_id);
+
+DROP TRIGGER IF EXISTS trg_campaign_match_weights_updated_at ON campaign_match_weights;
+CREATE TRIGGER trg_campaign_match_weights_updated_at
+    BEFORE UPDATE ON campaign_match_weights
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+

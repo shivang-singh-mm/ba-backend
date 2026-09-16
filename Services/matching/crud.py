@@ -6,7 +6,7 @@ All database reads and writes for campaign-provider matching.
 
 from typing import Optional, List, Dict, Any
 from Core.database import fetchone, fetchall, execute_returning, execute
-from .models import CampaignProviderMatch
+from .models import CampaignProviderMatch, CampaignMatchWeights
 from .enum import MATCH_STATUS_ID, MATCH_STATUS
 
 
@@ -376,4 +376,67 @@ def update_match_status(match_id: int, status_str: str) -> Optional[Dict[str, An
     if not row:
         return None
     return get_match_by_id(match_id)
+
+
+def upsert_campaign_match_weights(campaign_id: int, weights_data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Insert or update the custom matching weights for a given campaign.
+    """
+    loc_w = float(weights_data.get("location_weight", 0.20))
+    lang_w = float(weights_data.get("language_weight", 0.20))
+    ind_w = float(weights_data.get("industry_weight", 0.15))
+    skill_w = float(weights_data.get("skills_weight", 0.20))
+    ai_w = float(weights_data.get("ai_experience_weight", 0.25))
+
+    row = execute_returning(
+        """
+        INSERT INTO campaign_match_weights (
+            campaign_id, location_weight, language_weight,
+            industry_weight, skills_weight, ai_experience_weight
+        )
+        VALUES (%s, %s, %s, %s, %s, %s)
+        ON CONFLICT (campaign_id)
+        DO UPDATE SET
+            location_weight = EXCLUDED.location_weight,
+            language_weight = EXCLUDED.language_weight,
+            industry_weight = EXCLUDED.industry_weight,
+            skills_weight = EXCLUDED.skills_weight,
+            ai_experience_weight = EXCLUDED.ai_experience_weight,
+            updated_at = NOW()
+        RETURNING *
+        """,
+        (campaign_id, loc_w, lang_w, ind_w, skill_w, ai_w)
+    )
+    return CampaignMatchWeights.from_row(row).to_dict()
+
+
+def get_campaign_match_weights(campaign_id: int) -> Dict[str, float]:
+    """
+    Fetch the match weights stored for a campaign.
+    If none are stored, returns standard defaults.
+    """
+    row = fetchone(
+        """
+        SELECT location_weight, language_weight, industry_weight, skills_weight, ai_experience_weight
+        FROM campaign_match_weights
+        WHERE campaign_id = %s
+        """,
+        (campaign_id,)
+    )
+    if row:
+        return {
+            "location":      float(row["location_weight"]),
+            "language":      float(row["language_weight"]),
+            "industry":      float(row["industry_weight"]),
+            "skills":        float(row["skills_weight"]),
+            "ai_experience": float(row["ai_experience_weight"]),
+        }
+    return {
+        "location":      0.20,
+        "language":      0.20,
+        "industry":      0.15,
+        "skills":        0.20,
+        "ai_experience": 0.25,
+    }
+
 
