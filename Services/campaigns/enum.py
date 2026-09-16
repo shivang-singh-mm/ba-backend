@@ -12,3 +12,23 @@ STATUS = {
 }
 
 STATUS_ID = {v: k for k, v in STATUS.items()}
+
+# Language Proficiency: 1=basic, 2=conversational, 3=fluent, 4=native
+PROFICIENCY = {
+    1: "basic",
+    2: "conversational",
+    3: "fluent",
+    4: "native",
+}
+
+PROFICIENCY_ID = {v: k for k, v in PROFICIENCY.items()}
+
+# Matching Rule: 1=hard, 2=soft, 3=ignore
+MATCHING_RULE = {
+    1: "hard",
+    2: "soft",
+    3: "ignore",
+}
+
+MATCHING_RULE_ID = {v: k for k, v in MATCHING_RULE.items()}
+

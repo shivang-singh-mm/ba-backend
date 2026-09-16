@@ -41,16 +41,28 @@ class BaseConfig:
         "MAIL_DEFAULT_SENDER", "BrandActivation <no-reply@brandactivation.com>"
     )
 
-    # ── AI / OpenRouter ────────────────────────────────────────────────────────
+    # ── AI / OpenRouter / OpenAI ───────────────────────────────────────────────
     OPENROUTER_API_KEY   = os.environ.get("OPENROUTER_API_KEY", "")
     OPENROUTER_MODEL     = os.environ.get("OPENROUTER_MODEL", "meta-llama/llama-3.1-8b-instruct:free")
     OPENROUTER_SITE_URL  = os.environ.get("OPENROUTER_SITE_URL", "http://localhost:5000")
     OPENROUTER_SITE_NAME = os.environ.get("OPENROUTER_SITE_NAME", "BrandActivation")
 
+    OPENAI_API_KEY       = os.environ.get("OPENAI_API_KEY", "")
+
+    # ── Matching Engine Configuration ──────────────────────────────────────────
+    MATCHING_AI_PROVIDER = os.environ.get("MATCHING_AI_PROVIDER", "openai")  # openai | openrouter
+    MATCHING_AI_MODEL    = os.environ.get("MATCHING_AI_MODEL", "gpt-3.5-turbo")
+
+    MATCH_WEIGHT_LOCATION      = float(os.environ.get("MATCH_WEIGHT_LOCATION", 0.20))
+    MATCH_WEIGHT_LANGUAGE      = float(os.environ.get("MATCH_WEIGHT_LANGUAGE", 0.20))
+    MATCH_WEIGHT_INDUSTRY      = float(os.environ.get("MATCH_WEIGHT_INDUSTRY", 0.15))
+    MATCH_WEIGHT_SKILLS        = float(os.environ.get("MATCH_WEIGHT_SKILLS", 0.20))
+    MATCH_WEIGHT_AI_EXPERIENCE = float(os.environ.get("MATCH_WEIGHT_AI_EXPERIENCE", 0.25))
+
     # ── App ────────────────────────────────────────────────────────────────────
     APP_NAME = os.environ.get("APP_NAME", "BrandActivation")
 
-    FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+    FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:8081")
     JSON_SORT_KEYS = False
     PROPAGATE_EXCEPTIONS = True
 

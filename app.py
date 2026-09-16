@@ -14,6 +14,13 @@ from Services.user.routes import user_bp
 from Services.auth.routes import auth_bp
 from Services.payment.routes import payment_bp
 from Services.campaigns.routes import campaigns_bp
+from Services.location.routes import location_bp
+from Services.industry.routes import industry_bp
+from Services.skill.routes import skill_bp
+from Services.language.routes import language_bp
+from Services.provider.routes import provider_bp
+from Services.brand.routes import brand_bp
+from Services.matching.routes import matching_bp
 
 
 def create_app(config_name="development"):
@@ -21,7 +28,21 @@ def create_app(config_name="development"):
     app.config.from_object(config[config_name])
 
     # Extensions
-    CORS(app)
+    # CORS — allow the configured frontend + both local dev ports
+    _origins = [
+        app.config.get("FRONTEND_URL", "http://localhost:3000"),
+        "http://localhost:3000",   # ba-web (Next.js)
+        "http://localhost:8081",   # ba-android (Expo web)
+        "http://127.0.0.1:8081",
+        "http://127.0.0.1:3000",
+    ]
+    CORS(
+        app,
+        origins=_origins,
+        supports_credentials=True,
+        allow_headers=["Content-Type", "Authorization", "ngrok-skip-browser-warning"],
+        methods=["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+    )
     jwt.init_app(app)
     mail.init_app(app)
 
@@ -70,8 +91,16 @@ def create_app(config_name="development"):
     app.register_blueprint(user_bp,      url_prefix="/api/users")
     app.register_blueprint(payment_bp,   url_prefix="/api/payments")
     app.register_blueprint(campaigns_bp, url_prefix="/api/campaigns")
+    app.register_blueprint(location_bp,  url_prefix="/api/location")
+    app.register_blueprint(industry_bp,  url_prefix="/api/industry")
+    app.register_blueprint(skill_bp,     url_prefix="/api/skill")
+    app.register_blueprint(language_bp,  url_prefix="/api/language")
+    app.register_blueprint(provider_bp,  url_prefix="/api/provider")
+    app.register_blueprint(brand_bp,     url_prefix="/api/brand")
+    app.register_blueprint(matching_bp,  url_prefix="/api/matching")
 
     return app
+
 
 
 if __name__ == "__main__":

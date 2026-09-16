@@ -30,9 +30,16 @@ if not DATABASE_URL:
 #   users first (FK target), then auth (FKs to users), then payment, campaigns
 SCHEMA_FILES = [
     "Services/user/schema.sql",
+    "Services/location/schema.sql",
+    "Services/industry/schema.sql",
+    "Services/skill/schema.sql",
+    "Services/language/schema.sql",
+    "Services/provider/schema.sql",
+    "Services/brand/schema.sql",
     "Services/auth/schema.sql",
     "Services/payment/schema.sql",
     "Services/campaigns/schema.sql",
+    "Services/matching/schema.sql",
 ]
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
