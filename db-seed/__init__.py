@@ -30,6 +30,7 @@ try:
     from seed_languages import seed_languages
     from seed_brands import seed_brands
     from seed_candidates import seed_candidates
+    from seed_campaigns import seed_campaigns
 except ImportError:
     from .db import get_db_connection
     from .seed_cities import seed_cities
@@ -38,6 +39,7 @@ except ImportError:
     from .seed_languages import seed_languages
     from .seed_brands import seed_brands
     from .seed_candidates import seed_candidates
+    from .seed_campaigns import seed_campaigns
 
 
 def run_all(recreate: bool = False):
@@ -66,8 +68,11 @@ def run_all(recreate: bool = False):
         print("\n6. Seeding 300 Candidates & Provider Profiles...")
         seed_candidates(recreate=recreate, conn=conn)
 
+        print("\n7. Seeding 50 Live Campaigns (Oct 25 – Nov 04, 2026)...")
+        seed_campaigns(recreate=recreate, conn=conn)
+
         print("\n" + "=" * 60)
-        print("All seeds (Taxonomy, 100 Brands, 300 Candidates) completed successfully!")
+        print("All seeds (Taxonomy, 100 Brands, 300 Candidates, 50 Campaigns) completed successfully!")
         print("=" * 60)
     except Exception as e:
         conn.rollback()

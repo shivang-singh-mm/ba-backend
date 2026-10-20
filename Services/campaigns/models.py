@@ -264,6 +264,7 @@ class Campaign:
     venues: List[Dict[str, Any]] = field(default_factory=list)
     audience: Optional[Dict[str, Any]] = None
     languages: List[Dict[str, Any]] = field(default_factory=list)
+    skills: List[Dict[str, Any]] = field(default_factory=list)
     props: Optional[Dict[str, Any]] = None
     matching_rules: Optional[Dict[str, Any]] = None
 
@@ -277,6 +278,7 @@ class Campaign:
         venues: Optional[List[dict]] = None,
         audience: Optional[dict] = None,
         languages: Optional[List[dict]] = None,
+        skills: Optional[List[dict]] = None,
         props: Optional[dict] = None,
         matching_rules: Optional[dict] = None,
     ) -> "Campaign":
@@ -302,6 +304,7 @@ class Campaign:
             venues=venues or [],
             audience=audience,
             languages=languages or [],
+            skills=skills or [],
             props=props,
             matching_rules=matching_rules,
         )
@@ -326,6 +329,7 @@ class Campaign:
             "venues":         self.venues,
             "audience":       self.audience,
             "languages":      self.languages,
+            "skills":         self.skills,
             "props":          self.props,
             "matching_rules": self.matching_rules,
             "created_at":     self.created_at.isoformat() if self.created_at else None,

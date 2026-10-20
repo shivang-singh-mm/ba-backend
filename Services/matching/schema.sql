@@ -38,6 +38,10 @@ CREATE TRIGGER trg_campaign_provider_matches_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
+-- Alias view so queries referencing campaign_matches work seamlessly
+CREATE OR REPLACE VIEW campaign_matches AS
+    SELECT * FROM campaign_provider_matches;
+
 
 -- Campaign Match Weights
 CREATE TABLE IF NOT EXISTS campaign_match_weights (

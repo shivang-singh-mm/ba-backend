@@ -235,7 +235,7 @@ def get_brand_dashboard(user_id: int) -> Dict[str, Any]:
 
         # Fetch match count for this campaign
         match_count = fetchone(
-            "SELECT COUNT(*) AS cnt FROM campaign_matches WHERE campaign_id = %s AND is_eligible = TRUE",
+            "SELECT COUNT(*) AS cnt FROM campaign_provider_matches WHERE campaign_id = %s AND is_eligible = TRUE",
             (cr["id"],)
         )
 

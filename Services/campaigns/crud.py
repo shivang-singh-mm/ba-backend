@@ -140,6 +140,19 @@ def get_campaign_by_id(campaign_id: int) -> Optional[Dict[str, Any]]:
         for lr in language_rows
     ]
 
+    # 6b. Skills
+    skill_rows = fetchall(
+        """
+        SELECT s.id, s.name
+        FROM campaign_skills cs
+        JOIN skills s ON cs.skill_id = s.id
+        WHERE cs.campaign_id = %s
+        ORDER BY s.name ASC
+        """,
+        (campaign_id,)
+    )
+    skills = [dict(sr) for sr in skill_rows]
+
     # 7. Props
     props_row = fetchone(
         "SELECT * FROM campaign_props WHERE campaign_id = %s",
@@ -162,6 +175,7 @@ def get_campaign_by_id(campaign_id: int) -> Optional[Dict[str, Any]]:
         venues=venues,
         audience=audience,
         languages=languages,
+        skills=skills,
         props=props,
         matching_rules=matching_rules,
     ).to_dict()
@@ -332,6 +346,22 @@ def update_campaign_languages(campaign_id: int, data: dict) -> Optional[Dict[str
                 ON CONFLICT DO NOTHING
                 """,
                 (campaign_id, l_id, prof_id, is_req)
+            )
+
+    return get_campaign_by_id(campaign_id)
+
+
+def update_campaign_skills(campaign_id: int, data: dict) -> Optional[Dict[str, Any]]:
+    """Update required skills for a campaign."""
+    skills = data.get("skills", [])
+    execute("DELETE FROM campaign_skills WHERE campaign_id = %s", (campaign_id,))
+
+    for s in skills:
+        s_id = s["id"] if isinstance(s, dict) else s
+        if s_id:
+            execute(
+                "INSERT INTO campaign_skills (campaign_id, skill_id) VALUES (%s, %s) ON CONFLICT DO NOTHING",
+                (campaign_id, s_id)
             )
 
     return get_campaign_by_id(campaign_id)

@@ -17,6 +17,7 @@ from .crud import (
     update_campaign_venue,
     update_campaign_audience,
     update_campaign_languages,
+    update_campaign_skills,
     update_campaign_props,
     update_campaign_matching_rules,
     soft_delete_campaign,
@@ -144,6 +145,17 @@ def patch_campaign_languages(campaign_id: int):
     if not campaign:
         return error_response("Campaign not found", 404)
     return success_response(data=campaign, message="Campaign languages updated successfully")
+
+
+@campaigns_bp.route("/<int:campaign_id>/skills", methods=["PATCH"])
+@jwt_required()
+def patch_campaign_skills(campaign_id: int):
+    """Patch required skills for the campaign."""
+    data = request.get_json(silent=True) or {}
+    campaign = update_campaign_skills(campaign_id, data)
+    if not campaign:
+        return error_response("Campaign not found", 404)
+    return success_response(data=campaign, message="Campaign skills updated successfully")
 
 
 @campaigns_bp.route("/<int:campaign_id>/props", methods=["PATCH"])
