@@ -23,6 +23,30 @@ def get_my_brand_profile():
     return success_response(data=result)
 
 
+@brand_bp.route("/me/profile", methods=["PATCH"])
+@jwt_required()
+def patch_my_brand_personal():
+    user_id = int(get_jwt_identity())
+    brand = get_brand_by_user_id(user_id)
+    if not brand:
+        return error_response("Brand profile not found", 404)
+    data = request.get_json(silent=True) or {}
+    result = update_brand_personal(brand["id"], data)
+    return success_response(data=result, message="Brand profile updated successfully")
+
+
+@brand_bp.route("/me/associations", methods=["PATCH"])
+@jwt_required()
+def patch_my_brand_associations():
+    user_id = int(get_jwt_identity())
+    brand = get_brand_by_user_id(user_id)
+    if not brand:
+        return error_response("Brand profile not found", 404)
+    data = request.get_json(silent=True) or {}
+    result = update_brand_associations(brand["id"], data)
+    return success_response(data=result, message="Brand associations updated successfully")
+
+
 @brand_bp.route("/", methods=["POST"])
 @jwt_required()
 def create():

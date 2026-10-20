@@ -6,7 +6,7 @@ Flask==3.0.3
 flask-cors==4.0.1
 
 # ── PostgreSQL (native psycopg2 — no ORM) ────────────────────────────────────
-psycopg2-binary==2.9.9
+psycopg2-binary
 
 # ── Authentication ────────────────────────────────────────────────────────────
 Flask-JWT-Extended==4.6.0

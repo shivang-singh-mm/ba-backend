@@ -4,7 +4,7 @@ Matching Engine
 Core hybrid matching pipeline for campaign-to-provider evaluation:
 1. Hard filtering (deterministic eligibility).
 2. Structured score calculation (location, language, industry, skills).
-3. AI semantic experience scoring (evaluating user_experiences and roles).
+3. AI semantic experience scoring (evaluating provider_experiences and roles).
 4. Configurable weighted score aggregation and ranking.
 """
 

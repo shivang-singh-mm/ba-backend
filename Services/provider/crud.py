@@ -3,7 +3,7 @@ Provider CRUD — Raw psycopg2 Queries
 """
 
 from Core.database import fetchone, fetchall, execute_returning, execute
-from .models import ProviderProfile
+from .models import ProviderProfile, ProviderExperience
 from .enum import PROVIDER_TYPE_ID, PROFICIENCY, PROFICIENCY_ID, DOCUMENT_TYPE, DOCUMENT_TYPE_ID
 
 
@@ -55,7 +55,13 @@ def get_provider_by_id(provider_id: int) -> dict | None:
             "description": dr["description"]
         })
 
-    return ProviderProfile.from_row(row, industries, skills, languages, documents).to_dict()
+    exp_rows = fetchall(
+        "SELECT * FROM provider_experiences WHERE provider_id = %s ORDER BY created_at DESC",
+        (provider_id,)
+    )
+    experiences = [ProviderExperience.from_row(er).to_dict() for er in exp_rows]
+
+    return ProviderProfile.from_row(row, industries, skills, languages, documents, experiences).to_dict()
 
 
 def get_provider_by_user_id(user_id: int) -> dict | None:
@@ -146,3 +152,36 @@ def update_provider_professional(provider_id: int, data: dict) -> dict | None:
             execute("INSERT INTO provider_languages (provider_id, language_id, proficiency) VALUES (%s, %s, %s) ON CONFLICT DO NOTHING", (provider_id, l_id, prof_id))
 
     return get_provider_by_id(provider_id)
+
+
+# ── Provider Experiences CRUD ─────────────────────────────────────────────────
+
+def get_provider_experiences(provider_id: int) -> list[dict]:
+    """Retrieve all past campaign experiences for a provider."""
+    rows = fetchall(
+        "SELECT * FROM provider_experiences WHERE provider_id = %s ORDER BY created_at DESC",
+        (provider_id,)
+    )
+    return [ProviderExperience.from_row(r).to_dict() for r in rows]
+
+
+def add_provider_experience(provider_id: int, data: dict) -> dict:
+    """Add a new past campaign experience record for a provider."""
+    row = execute_returning(
+        """
+        INSERT INTO provider_experiences (provider_id, brand_name, role_name, duration, description)
+        VALUES (%s, %s, %s, %s, %s)
+        RETURNING *
+        """,
+        (provider_id, data.get("brand_name"), data.get("role_name"), data.get("duration"), data.get("description"))
+    )
+    return ProviderExperience.from_row(row).to_dict()
+
+
+def delete_provider_experience(provider_id: int, experience_id: int) -> bool:
+    """Delete a specific experience record for a provider."""
+    affected = execute(
+        "DELETE FROM provider_experiences WHERE id = %s AND provider_id = %s",
+        (experience_id, provider_id)
+    )
+    return affected > 0

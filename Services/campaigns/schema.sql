@@ -115,6 +115,20 @@ CREATE TABLE IF NOT EXISTS campaign_industries (
 CREATE INDEX IF NOT EXISTS idx_campaign_industries_campaign ON campaign_industries(campaign_id);
 
 
+-- Campaign Skills (Required skills for campaign execution)
+CREATE TABLE IF NOT EXISTS campaign_skills (
+    id                  SERIAL          PRIMARY KEY,
+    campaign_id         INTEGER         NOT NULL REFERENCES campaigns(id) ON DELETE CASCADE,
+    skill_id            INTEGER         NOT NULL REFERENCES skills(id) ON DELETE CASCADE,
+
+    created_at          TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+
+    UNIQUE(campaign_id, skill_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_campaign_skills_campaign ON campaign_skills(campaign_id);
+
+
 -- Campaign Type Map (Primary & Secondary Campaign Types)
 CREATE TABLE IF NOT EXISTS campaign_type_map (
     id                  SERIAL          PRIMARY KEY,

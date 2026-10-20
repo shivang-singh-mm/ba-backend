@@ -80,3 +80,23 @@ CREATE TRIGGER trg_provider_documents_updated_at
     BEFORE UPDATE ON provider_documents
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+-- Provider Experiences
+CREATE TABLE IF NOT EXISTS provider_experiences (
+    id          SERIAL          PRIMARY KEY,
+    provider_id INTEGER         NOT NULL REFERENCES provider_profiles(id) ON DELETE CASCADE,
+    brand_name  VARCHAR(150)    NOT NULL,
+    role_name   VARCHAR(100)    NOT NULL,
+    duration    VARCHAR(50),
+    description TEXT,
+    created_at  TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_provider_experiences_provider ON provider_experiences (provider_id);
+
+DROP TRIGGER IF EXISTS trg_provider_experiences_updated_at ON provider_experiences;
+CREATE TRIGGER trg_provider_experiences_updated_at
+    BEFORE UPDATE ON provider_experiences
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();

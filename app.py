@@ -21,6 +21,7 @@ from Services.language.routes import language_bp
 from Services.provider.routes import provider_bp
 from Services.brand.routes import brand_bp
 from Services.matching.routes import matching_bp
+from Services.dashboard.routes import dashboard_bp
 
 
 def create_app(config_name="development"):
@@ -98,6 +99,7 @@ def create_app(config_name="development"):
     app.register_blueprint(provider_bp,  url_prefix="/api/provider")
     app.register_blueprint(brand_bp,     url_prefix="/api/brand")
     app.register_blueprint(matching_bp,  url_prefix="/api/matching")
+    app.register_blueprint(dashboard_bp, url_prefix="/api/dashboard")
 
     return app
 

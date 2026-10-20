@@ -18,7 +18,7 @@ def get_all_provider_candidates() -> List[Dict[str, Any]]:
     - Skills (list of ids and names)
     - Languages (list of ids, names, proficiency integer)
     - Industries (list of ids, names)
-    - Past user_experiences (brand_name, role_name, duration, description)
+    - Past provider_experiences (brand_name, role_name, duration, description)
     """
     # 1. Fetch base provider profiles joined with users and cities
     provider_rows = fetchall(
@@ -103,19 +103,19 @@ def get_all_provider_candidates() -> List[Dict[str, Any]]:
             "name": ir["industry_name"],
         })
 
-    # 5. Fetch past campaign user_experiences
+    # 5. Fetch past campaign provider_experiences
     exp_rows = fetchall(
         """
-        SELECT id, user_id, brand_name, role_name, duration, description
-        FROM user_experiences
-        WHERE user_id = ANY(%s)
+        SELECT id, provider_id, brand_name, role_name, duration, description
+        FROM provider_experiences
+        WHERE provider_id = ANY(%s)
         ORDER BY created_at DESC
         """,
-        (user_ids,)
+        (provider_ids,)
     )
     exp_map: Dict[int, List[Dict[str, Any]]] = {}
     for er in exp_rows:
-        exp_map.setdefault(er["user_id"], []).append({
+        exp_map.setdefault(er["provider_id"], []).append({
             "id": er["id"],
             "brand_name": er["brand_name"],
             "role_name": er["role_name"],
@@ -127,12 +127,11 @@ def get_all_provider_candidates() -> List[Dict[str, Any]]:
     candidates = []
     for pr in provider_rows:
         pid = pr["provider_id"]
-        uid = pr["user_id"]
         candidate = dict(pr)
         candidate["skills"] = skills_map.get(pid, [])
         candidate["languages"] = langs_map.get(pid, [])
         candidate["industries"] = inds_map.get(pid, [])
-        candidate["experiences"] = exp_map.get(uid, [])
+        candidate["experiences"] = exp_map.get(pid, [])
         candidates.append(candidate)
 
     return candidates

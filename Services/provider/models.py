@@ -27,9 +27,10 @@ class ProviderProfile:
     skills: list[dict] = field(default_factory=list)
     languages: list[dict] = field(default_factory=list)
     documents: list[dict] = field(default_factory=list)
+    experiences: list[dict] = field(default_factory=list)
 
     @classmethod
-    def from_row(cls, row: dict, industries: list = None, skills: list = None, languages: list = None, documents: list = None) -> "ProviderProfile":
+    def from_row(cls, row: dict, industries: list = None, skills: list = None, languages: list = None, documents: list = None, experiences: list = None) -> "ProviderProfile":
         return cls(
             id=row["id"],
             user_id=row["user_id"],
@@ -48,6 +49,7 @@ class ProviderProfile:
             skills=skills or [],
             languages=languages or [],
             documents=documents or [],
+            experiences=experiences or [],
         )
 
     def to_dict(self) -> dict:
@@ -67,6 +69,44 @@ class ProviderProfile:
             "skills":             self.skills,
             "languages":          self.languages,
             "documents":          self.documents,
+            "experiences":        self.experiences,
             "created_at":         self.created_at.isoformat() if self.created_at else None,
             "updated_at":         self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+
+@dataclass
+class ProviderExperience:
+    id: int
+    provider_id: int
+    brand_name: str
+    role_name: str
+    duration: Optional[str]
+    description: Optional[str]
+    created_at: datetime
+    updated_at: datetime
+
+    @classmethod
+    def from_row(cls, row: dict) -> "ProviderExperience":
+        return cls(
+            id=row["id"],
+            provider_id=row["provider_id"],
+            brand_name=row["brand_name"],
+            role_name=row["role_name"],
+            duration=row.get("duration"),
+            description=row.get("description"),
+            created_at=row["created_at"],
+            updated_at=row["updated_at"],
+        )
+
+    def to_dict(self) -> dict:
+        return {
+            "id":          self.id,
+            "provider_id": self.provider_id,
+            "brand_name":  self.brand_name,
+            "role_name":   self.role_name,
+            "duration":    self.duration,
+            "description": self.description,
+            "created_at":  self.created_at.isoformat() if self.created_at else None,
+            "updated_at":  self.updated_at.isoformat() if self.updated_at else None,
         }

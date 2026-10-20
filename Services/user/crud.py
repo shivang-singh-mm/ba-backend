@@ -5,7 +5,7 @@ All queries run against the `users` table defined in schema.sql.
 """
 
 from Core.database import fetchone, fetchall, execute_returning, execute
-from .models import User, UserExperience
+from .models import User
 
 
 def get_all_users() -> list[dict]:
@@ -17,27 +17,25 @@ def get_all_users() -> list[dict]:
 
 
 def get_user_by_id(user_id: int) -> dict | None:
-    """Fetch a single user by primary key with experiences."""
+    """Fetch a single user by primary key."""
     row = fetchone(
         "SELECT * FROM users WHERE id = %s AND is_deleted = FALSE",
         (user_id,)
     )
     if not row:
         return None
-    experiences = get_user_experiences(user_id)
-    return User.from_row(row, experiences).to_dict()
+    return User.from_row(row).to_dict()
 
 
 def get_user_by_email(email: str) -> dict | None:
-    """Fetch a user by their email address with experiences."""
+    """Fetch a user by their email address."""
     row = fetchone(
         "SELECT * FROM users WHERE email = %s AND is_deleted = FALSE",
         (email.lower().strip(),)
     )
     if not row:
         return None
-    experiences = get_user_experiences(row["id"])
-    return User.from_row(row, experiences).to_dict()
+    return User.from_row(row).to_dict()
 
 
 def create_user(name: str, email: str, role: str = "user", phone: str = None) -> dict:
@@ -81,35 +79,4 @@ def soft_delete_user(user_id: int) -> bool:
     return affected > 0
 
 
-# ── User Experiences CRUD ─────────────────────────────────────────────────────
-
-def get_user_experiences(user_id: int) -> list[UserExperience]:
-    """Retrieve all past campaign experiences for a user."""
-    rows = fetchall(
-        "SELECT * FROM user_experiences WHERE user_id = %s ORDER BY created_at DESC",
-        (user_id,)
-    )
-    return [UserExperience.from_row(r) for r in rows]
-
-
-def add_user_experience(user_id: int, data: dict) -> dict:
-    """Add a new past campaign experience record."""
-    row = execute_returning(
-        """
-        INSERT INTO user_experiences (user_id, brand_name, role_name, duration, description)
-        VALUES (%s, %s, %s, %s, %s)
-        RETURNING *
-        """,
-        (user_id, data.get("brand_name"), data.get("role_name"), data.get("duration"), data.get("description"))
-    )
-    return UserExperience.from_row(row).to_dict()
-
-
-def delete_user_experience(user_id: int, experience_id: int) -> bool:
-    """Delete a specific experience record, confirming owner user_id."""
-    affected = execute(
-        "DELETE FROM user_experiences WHERE id = %s AND user_id = %s",
-        (experience_id, user_id)
-    )
-    return affected > 0
 
